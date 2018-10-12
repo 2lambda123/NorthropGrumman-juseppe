@@ -40,7 +40,6 @@ public class HPICreationTest {
         @Override
         protected void before() throws Throwable {
             folderToSave = tmp.newFolder();
-            System.out.println(folderToSave.getAbsolutePath());
             clearProperty(JuseppeEnvVars.JuseppeEnvEnum.JUSEPPE_SAVE_TO_DIR.mapping());
             setProperty(JuseppeEnvVars.JuseppeEnvEnum.JUSEPPE_SAVE_TO_DIR.mapping(), folderToSave.getAbsolutePath());
         }
@@ -51,10 +50,12 @@ public class HPICreationTest {
     @Test
     public void shouldSaveJsonWithPluginInfo() throws IOException {
         File file = tmp.newFile("temp.json");
+        ClassLoader classloader = getClass().getClassLoader();
+        File fullFilePath = new File(classloader.getResource(PLUGINS_DIR_CLASSPATH).getFile());
 
         updateSite(
                 Props.populated()
-                        .withPluginsDir(getResource(PLUGINS_DIR_CLASSPATH).getFile())
+                        .withPluginsDir(fullFilePath.toString())
                         .withBaseurl(URI.create(BASE_URL_OF_SITE))
                         .withSaveto(file.getParent())
                         .withUcJsonName(file.getName())
@@ -67,9 +68,11 @@ public class HPICreationTest {
     @Test
     public void shouldSaveJsonWithReleaseHistory() throws IOException {
         File file = new File(folderToSave, Props.populated().getReleaseHistoryJsonName());
+        ClassLoader classloader = getClass().getClassLoader();
+        File fullFilePath = new File(classloader.getResource(PLUGINS_DIR_CLASSPATH).getFile());
 
         UpdateSiteGen.updateSite(Props.populated()
-                .withPluginsDir(getResource(PLUGINS_DIR_CLASSPATH).getFile())).withDefaults().toSave().saveAll();
+                .withPluginsDir(fullFilePath.toString())).withDefaults().toSave().saveAll();
 
         assertThat(file, exists());
         assertThat(file.length(), greaterThan(200l));
@@ -77,8 +80,11 @@ public class HPICreationTest {
 
     @Test
     public void shouldContainPlugin() throws IOException {
+        ClassLoader classloader = getClass().getClassLoader();
+        File fullFilePath = new File(classloader.getResource(PLUGINS_DIR_CLASSPATH).getFile());
+
         List<String> contents = UpdateSiteGen.updateSite(Props.populated()
-                .withPluginsDir(getResource(PLUGINS_DIR_CLASSPATH).getFile())).withDefaults().toSave()
+                .withPluginsDir(fullFilePath.toString())).withDefaults().toSave()
                 .savables().stream()
                 .map(SavableSite::getView)
                 .map(UpdateSiteView::content)

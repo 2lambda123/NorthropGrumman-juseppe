@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import ru.lanwen.jenkins.juseppe.props.Props;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
@@ -24,14 +25,19 @@ public class ServeRule extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
+        ClassLoader classloader = getClass().getClassLoader();
+        File plugins = new File(classloader.getResource("serve/plugins").getFile());
+        File key = new File(classloader.getResource("serve/cert/uc.key").getFile());
+        File crt = new File(classloader.getResource("serve/cert/uc.crt").getFile());
         port = findRandomOpenPortOnAllLocalInterfaces();
+
         future = CompletableFuture.runAsync(() -> {
             try {
                 new ServeCommand().unsafeRun(Props.populated()
                         .withBaseurl(uri())
-                        .withPluginsDir(getResource("serve/plugins").getFile())
-                        .withCert(getResource("serve/cert/uc.crt").getFile())
-                        .withKey(getResource("serve/cert/uc.key").getFile())
+                        .withPluginsDir(plugins.toString())
+                        .withCert(crt.toString())
+                        .withKey(key.toString())
                         .withPort(port));
             } catch (Exception e) {
                 LOG.error("Can't start juseppe", e);

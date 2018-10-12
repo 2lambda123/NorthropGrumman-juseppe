@@ -58,7 +58,7 @@ public class UpdateSiteGen {
                         .forEach(source -> site.getPlugins().addAll(source.plugins()))
         ).register(
                 site -> site.getPlugins()
-                        .forEach(plugin -> plugin.setUrl(format("%s/%s", props.getBaseurl(), plugin.getUrl())))
+                        .forEach(plugin -> plugin.setUrl(format("%s/%s", props.getBaseurl(), plugin.getUrl()).replace("\\", "/")))
         ).register(
                 site -> {
                     try {

@@ -4,6 +4,8 @@ import org.junit.Test;
 import ru.lanwen.jenkins.juseppe.beans.Plugin;
 
 import java.nio.file.Paths;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import static com.google.common.io.Resources.getResource;
@@ -21,7 +23,10 @@ public class PathPluginSourceTest {
     @Test
     public void shouldFindAllPlugins() throws Exception {
         boolean recursiveWatch = false;
-        List<Plugin> plugins = new PathPluginSource(Paths.get(getResource(PLUGINS_DIR_CLASSPATH).getFile()),
+        ClassLoader classloader = getClass().getClassLoader();
+        File file = new File(classloader.getResource(PLUGINS_DIR_CLASSPATH).getFile());
+        Path path = file.toPath();
+        List<Plugin> plugins = new PathPluginSource(path,
                                                     recursiveWatch)
                 .plugins();
 
@@ -33,7 +38,10 @@ public class PathPluginSourceTest {
     @Test
     public void shouldFindAllPluginsRecursively() throws Exception {
         boolean recursiveWatch = true;
-        List<Plugin> plugins = new PathPluginSource(Paths.get(getResource(PLUGINS_DIR_CLASSPATH).getFile()),
+        ClassLoader classloader = getClass().getClassLoader();
+        File file = new File(classloader.getResource(PLUGINS_DIR_CLASSPATH).getFile());
+        Path path = file.toPath();
+        List<Plugin> plugins = new PathPluginSource(path,
                                                     recursiveWatch)
                  .plugins();
 

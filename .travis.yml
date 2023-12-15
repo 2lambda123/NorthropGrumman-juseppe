@@ -1,11 +1,17 @@
 language: java
-sudo: false
 
 jdk:
- - oraclejdk8
+  - openjdk8
+
+before_install:
+  - chmod +x gradlew
+
+script:
+  - ./gradlew check
+  - ./gradlew cobertura
 
 after_success:
-  - mvn clean cobertura:cobertura -Dcobertura.report.format=xml org.eluder.coveralls:coveralls-maven-plugin:3.1.0:report
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
- email: false
+  email: false
